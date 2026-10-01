@@ -1,6 +1,9 @@
 export type ScreenType =
-  | 'login'
   | 'dashboard'
+  | 'trade-scout'
+  | 'saved-leads'
+  | 'research-history'
+  | 'login'
   | 'ai-assistant'
   | 'marketplace'
   | 'supplier-profile'
@@ -30,6 +33,84 @@ export interface User {
   country: string;
   avatar: string;
   verified: boolean;
+}
+
+export interface ProspectContact {
+  id: string;
+  name: string;
+  role: string;
+  company: string;
+  publicProfileUrl?: string;
+  contactAvailability: 'Verified Available' | 'Likely Match' | 'Contact info not verified';
+  verificationStatus: 'Verified' | 'Unverified' | 'Public Record';
+  emailDemo?: string;
+  phoneDemo?: string;
+  department: string;
+  decisionPower: 'High (Procurement/Signer)' | 'Medium (Technical Reviewer)' | 'Operations';
+}
+
+export interface ProspectCompany {
+  id: string;
+  name: string;
+  country: string;
+  city: string;
+  companyType: 'Import Distributor' | 'Wholesale Integrator' | 'Direct Importer & Retailer' | 'Engineering Contractor' | 'Logistics & Cold Storage';
+  productRelevance: 'Highly Relevant' | 'Relevant' | 'Needs Review';
+  relevanceScore: number; // e.g. 96
+  importActivity: string; // e.g. "Active (Last shipment 18 days ago)"
+  importFrequency: 'High (Monthly+)' | 'Moderate (Quarterly)' | 'Occasional';
+  approxVolume: string; // e.g. "$450k - $800k / year"
+  sourcingCountries: string[]; // e.g. ["China", "India", "Turkey", "Germany"]
+  website: string;
+  verificationStatus: 'Verified Importer' | 'Registered Business' | 'Needs Review';
+  whyThisCompany: string;
+  whatNeedsVerification: string[];
+  overview: string;
+  productsHandled: string[];
+  importHistorySummary: string;
+  companySignals: string[];
+  contacts: ProspectContact[];
+  sources: {
+    title: string;
+    type: 'Trade Manifest' | 'Business Registry' | 'Company Website' | 'Customs Filing' | 'Business Directory';
+    date: string;
+    verified: boolean;
+  }[];
+  potentialOpportunity: string;
+  savedAsLead?: boolean;
+}
+
+export interface ResearchSession {
+  id: string;
+  product: string;
+  targetMarket: string;
+  researchGoal: string;
+  companyType?: string;
+  importFrequency?: string;
+  sourcingCountry?: string;
+  status: 'Completed' | 'In Progress' | 'Draft';
+  companiesAnalyzed: number;
+  matchedCount: number;
+  shortlistedCount: number;
+  createdAt: string;
+  prospects: ProspectCompany[];
+}
+
+export interface SavedLead {
+  id: string;
+  companyId: string;
+  company: string;
+  country: string;
+  contactName: string;
+  contactRole: string;
+  product: string;
+  status: 'New' | 'Qualified' | 'Contacted' | 'Interested' | 'Follow-up' | 'Not Relevant';
+  qualification: 'Highly Relevant' | 'Relevant' | 'Needs Review';
+  aiReason: string;
+  notes: string;
+  lastResearchDate: string;
+  nextAction: string;
+  website: string;
 }
 
 export interface Supplier {
@@ -127,7 +208,7 @@ export interface Order {
   deliveryDate: string;
   destinationPort: string;
   status: 'Order Confirmed' | 'Documents In Review' | 'In Production' | 'Shipment' | 'Delivered';
-  stageNumber: number; // 1 to 5
+  stageNumber: number;
   documentsCount: {
     total: number;
     approved: number;

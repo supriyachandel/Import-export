@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   LayoutDashboard,
-  Bot,
+  Compass,
+  Bookmark,
+  Clock,
   Store,
   FileQuestion,
   Scale,
@@ -10,13 +12,12 @@ import {
   Ship,
   Users,
   BarChart3,
-  Bell,
-  Settings,
   ShieldCheck,
-  ChevronRight,
   Sparkles,
-  ExternalLink,
-  Flame
+  ChevronDown,
+  ChevronRight,
+  Settings,
+  Layers
 } from 'lucide-react';
 import { ScreenType, UserRole } from '../../types';
 
@@ -24,60 +25,63 @@ interface SidebarProps {
   currentScreen: ScreenType;
   onNavigate: (screen: ScreenType) => void;
   userRole: UserRole;
-  unreadExceptionsCount: number;
-  pendingQuotesCount: number;
+  savedLeadsCount: number;
+  researchesCount: number;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   currentScreen,
   onNavigate,
   userRole,
-  unreadExceptionsCount,
-  pendingQuotesCount
+  savedLeadsCount,
+  researchesCount
 }) => {
-  const mainNavItems: { id: ScreenType; label: string; icon: React.ReactNode; badge?: string | number; badgeColor?: string; isAi?: boolean }[] = [
+  const [futureModulesOpen, setFutureModulesOpen] = useState(false);
+
+  const primaryNavItems: {
+    id: ScreenType;
+    label: string;
+    icon: React.ReactNode;
+    badge?: string | number;
+    badgeColor?: string;
+    isAiPrimary?: boolean;
+  }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} /> },
     {
-      id: 'ai-assistant',
-      label: 'AI Trade Assistant',
-      icon: <Bot size={18} />,
-      isAi: true,
-      badge: 'PRO',
+      id: 'trade-scout',
+      label: 'AI Trade Scout',
+      icon: <Compass size={18} />,
+      isAiPrimary: true,
+      badge: 'CORE',
       badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'
     },
-    { id: 'marketplace', label: 'B2B Marketplace', icon: <Store size={18} /> },
-    { id: 'rfqs', label: 'RFQs & Sourcing', icon: <FileQuestion size={18} />, badge: '3 Active' },
     {
-      id: 'quotations',
-      label: 'Quotation Matrix',
-      icon: <Scale size={18} />,
-      badge: pendingQuotesCount > 0 ? pendingQuotesCount : undefined,
+      id: 'saved-leads',
+      label: 'Saved Leads',
+      icon: <Bookmark size={18} />,
+      badge: savedLeadsCount > 0 ? savedLeadsCount : 42,
       badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
     },
-    { id: 'orders', label: 'Orders (ORD-1024)', icon: <Package size={18} />, badge: '$78k' },
     {
-      id: 'documents',
-      label: 'AI Trade Documents',
-      icon: <FileText size={18} />,
-      badge: '1 Flag',
-      badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-    },
-    {
-      id: 'shipments',
-      label: 'Shipment Tracking',
-      icon: <Ship size={18} />,
-      badge: 'Delay Alert',
-      badgeColor: 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-    },
-    { id: 'crm', label: 'CRM & Leads', icon: <Users size={18} /> },
-    { id: 'analytics', label: 'Trade Analytics', icon: <BarChart3 size={18} /> },
-    {
-      id: 'admin',
-      label: 'Operations & Admin',
-      icon: <ShieldCheck size={18} />,
-      badge: unreadExceptionsCount > 0 ? `${unreadExceptionsCount} HITL` : undefined,
-      badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+      id: 'research-history',
+      label: 'Research History',
+      icon: <Clock size={18} />,
+      badge: researchesCount > 0 ? `${researchesCount}` : '24',
+      badgeColor: 'bg-slate-700/50 text-slate-300 border-slate-600'
     }
+  ];
+
+  const secondaryNavItems: { id: ScreenType; label: string; icon: React.ReactNode }[] = [
+    { id: 'ai-assistant', label: 'AI Trade Assistant', icon: <Sparkles size={16} /> },
+    { id: 'marketplace', label: 'B2B Marketplace', icon: <Store size={16} /> },
+    { id: 'rfqs', label: 'RFQs & Sourcing', icon: <FileQuestion size={16} /> },
+    { id: 'quotations', label: 'Quotation Matrix', icon: <Scale size={16} /> },
+    { id: 'orders', label: 'Order Management', icon: <Package size={16} /> },
+    { id: 'documents', label: 'Trade Documents (OCR)', icon: <FileText size={16} /> },
+    { id: 'shipments', label: 'Shipment Tracking', icon: <Ship size={16} /> },
+    { id: 'crm', label: 'CRM & Pipeline', icon: <Users size={16} /> },
+    { id: 'analytics', label: 'Trade Analytics', icon: <BarChart3 size={16} /> },
+    { id: 'admin', label: 'Admin & Operations', icon: <ShieldCheck size={16} /> }
   ];
 
   return (
@@ -127,27 +131,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
               borderRadius: '4px',
               border: '1px solid #334155'
             }}>
-              OS v2.4
+              SCOUT
             </span>
           </div>
-          <p style={{ fontSize: '0.72rem', color: '#64748b' }}>AI Import-Export Platform</p>
+          <p style={{ fontSize: '0.72rem', color: '#64748b' }}>AI Trade Scout • Milestone 1</p>
         </div>
       </div>
 
-      {/* Navigation List */}
+      {/* Primary Navigation List */}
       <div style={{
         flex: 1,
         overflowY: 'auto',
         padding: '12px 10px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '3px'
+        gap: '4px'
       }}>
         <div style={{ padding: '6px 8px', fontSize: '0.68rem', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-          Trade Core Workflow
+          Milestone 1 Core
         </div>
 
-        {mainNavItems.map((item) => {
+        {primaryNavItems.map((item) => {
           const isActive = currentScreen === item.id;
           return (
             <button
@@ -157,19 +161,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '9px 12px',
+                padding: '10px 12px',
                 borderRadius: '8px',
-                border: isActive ? '1px solid rgba(99, 102, 241, 0.4)' : '1px solid transparent',
+                border: isActive
+                  ? '1px solid rgba(99, 102, 241, 0.5)'
+                  : item.isAiPrimary
+                  ? '1px solid rgba(99, 102, 241, 0.25)'
+                  : '1px solid transparent',
                 backgroundColor: isActive
-                  ? 'rgba(99, 102, 241, 0.15)'
+                  ? 'rgba(99, 102, 241, 0.2)'
+                  : item.isAiPrimary
+                  ? 'rgba(99, 102, 241, 0.08)'
                   : 'transparent',
-                color: isActive ? '#ffffff' : item.isAi ? '#c7d2fe' : '#94a3b8',
+                color: isActive ? '#ffffff' : item.isAiPrimary ? '#c7d2fe' : '#94a3b8',
                 cursor: 'pointer',
-                transition: 'all 0.15s ease',
                 textAlign: 'left',
                 width: '100%',
-                fontWeight: isActive ? 600 : 500,
-                fontSize: '0.85rem'
+                fontWeight: isActive ? 700 : item.isAiPrimary ? 600 : 500,
+                fontSize: '0.86rem',
+                transition: 'all 0.15s ease'
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
@@ -179,30 +189,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
               }}
               onMouseLeave={(e) => {
                 if (!isActive) {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = item.isAi ? '#c7d2fe' : '#94a3b8';
+                  e.currentTarget.style.backgroundColor = item.isAiPrimary ? 'rgba(99, 102, 241, 0.08)' : 'transparent';
+                  e.currentTarget.style.color = item.isAiPrimary ? '#c7d2fe' : '#94a3b8';
                 }
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ color: isActive ? '#38bdf8' : item.isAi ? '#818cf8' : '#64748b' }}>
+                <span style={{ color: isActive ? '#38bdf8' : item.isAiPrimary ? '#818cf8' : '#64748b' }}>
                   {item.icon}
                 </span>
                 <span>{item.label}</span>
               </div>
 
               {item.badge && (
-                <span style={{
-                  fontSize: '0.68rem',
-                  fontWeight: 700,
-                  padding: '2px 7px',
-                  borderRadius: '9999px',
-                  border: '1px solid',
-                  backgroundColor: item.badgeColor ? undefined : 'rgba(51, 65, 85, 0.5)',
-                  color: item.badgeColor ? undefined : '#94a3b8',
-                  borderColor: item.badgeColor ? undefined : '#334155',
-                }}
-                className={item.badgeColor}
+                <span
+                  style={{
+                    fontSize: '0.68rem',
+                    fontWeight: 700,
+                    padding: '2px 7px',
+                    borderRadius: '9999px',
+                    border: '1px solid'
+                  }}
+                  className={item.badgeColor || 'bg-slate-800 text-slate-300 border-slate-700'}
                 >
                   {item.badge}
                 </span>
@@ -210,9 +218,65 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           );
         })}
+
+        {/* Secondary: Platform Roadmap / Coming Soon Section */}
+        <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #1e293b' }}>
+          <button
+            onClick={() => setFutureModulesOpen(!futureModulesOpen)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+              padding: '6px 8px',
+              background: 'none',
+              border: 'none',
+              color: '#64748b',
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              cursor: 'pointer'
+            }}
+          >
+            <span>Future Milestones</span>
+            {futureModulesOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          </button>
+
+          {futureModulesOpen && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '6px' }}>
+              {secondaryNavItems.map((item) => {
+                const isActive = currentScreen === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => onNavigate(item.id)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '7px 10px',
+                      borderRadius: '6px',
+                      border: 'none',
+                      backgroundColor: isActive ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
+                      color: isActive ? '#38bdf8' : '#64748b',
+                      fontSize: '0.78rem',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      width: '100%'
+                    }}
+                  >
+                    <span>{item.icon}</span>
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* AI Assistant Quick Card Promo */}
+      {/* Trade Scout Quick Discovery CTA */}
       <div style={{
         padding: '12px',
         margin: '8px 10px',
@@ -220,18 +284,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
         background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(6, 182, 212, 0.12) 100%)',
         border: '1px solid rgba(99, 102, 241, 0.3)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Sparkles size={14} color="#38bdf8" />
-            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#e0e7ff' }}>AI Autonomous Sourcing</span>
-          </div>
-          <span style={{ fontSize: '0.62rem', background: '#10b981', color: '#064e3b', fontWeight: 800, padding: '1px 5px', borderRadius: '4px' }}>LIVE</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+          <Sparkles size={14} color="#38bdf8" />
+          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#e0e7ff' }}>Explore New Market</span>
         </div>
         <p style={{ fontSize: '0.72rem', color: '#94a3b8', marginBottom: '8px', lineHeight: '1.3' }}>
-          3 quotes analyzed for RFQ-2048 with 1 OCR discrepancy flagged.
+          Research distributors for your products in 50+ global markets.
         </p>
         <button
-          onClick={() => onNavigate('ai-assistant')}
+          onClick={() => onNavigate('trade-scout')}
           style={{
             width: '100%',
             padding: '6px 10px',
@@ -248,12 +309,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
             gap: '4px'
           }}
         >
-          <span>Ask TradeAI</span>
+          <span>Launch AI Trade Scout</span>
           <ChevronRight size={13} />
         </button>
       </div>
 
-      {/* Footer Role Indicator */}
+      {/* Footer User Info */}
       <div style={{
         padding: '14px 16px',
         borderTop: '1px solid #1e293b',
@@ -265,23 +326,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', boxShadow: '0 0 8px #10b981' }} />
           <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#e2e8f0' }}>Global Trade Imports</div>
-            <div style={{ fontSize: '0.68rem', color: '#64748b', textTransform: 'capitalize' }}>Role: {userRole} (Demo)</div>
+            <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#e2e8f0' }}>Apex Equipment Exporters</div>
+            <div style={{ fontSize: '0.68rem', color: '#64748b' }}>Demo Exporter Profile</div>
           </div>
         </div>
-        <button
-          onClick={() => onNavigate('login')}
-          title="Switch User / Logout"
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#64748b',
-            cursor: 'pointer',
-            padding: '4px'
-          }}
-        >
-          <Settings size={16} />
-        </button>
       </div>
     </aside>
   );

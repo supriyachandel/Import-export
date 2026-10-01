@@ -10,7 +10,7 @@ import {
   ListOrdered,
   X
 } from 'lucide-react';
-import { DEMO_TOUR_STEPS } from '../../data/mockData';
+import { TRADE_SCOUT_TOUR_STEPS } from '../../data/tradeScoutData';
 import { ScreenType } from '../../types';
 
 interface DemoTourBannerProps {
@@ -27,15 +27,18 @@ export const DemoTourBanner: React.FC<DemoTourBannerProps> = ({
   const [collapsed, setCollapsed] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const step = DEMO_TOUR_STEPS[currentStepIndex] || DEMO_TOUR_STEPS[0];
+  const step = TRADE_SCOUT_TOUR_STEPS[currentStepIndex] || TRADE_SCOUT_TOUR_STEPS[0];
   const isFirst = currentStepIndex === 0;
-  const isLast = currentStepIndex === DEMO_TOUR_STEPS.length - 1;
+  const isLast = currentStepIndex === TRADE_SCOUT_TOUR_STEPS.length - 1;
 
   const handleNext = () => {
     if (!isLast) {
       const nextIdx = currentStepIndex + 1;
       onSelectStep(nextIdx);
-      onNavigate(DEMO_TOUR_STEPS[nextIdx].screen);
+      onNavigate(TRADE_SCOUT_TOUR_STEPS[nextIdx].screen);
+    } else {
+      onSelectStep(0);
+      onNavigate(TRADE_SCOUT_TOUR_STEPS[0].screen);
     }
   };
 
@@ -43,7 +46,7 @@ export const DemoTourBanner: React.FC<DemoTourBannerProps> = ({
     if (!isFirst) {
       const prevIdx = currentStepIndex - 1;
       onSelectStep(prevIdx);
-      onNavigate(DEMO_TOUR_STEPS[prevIdx].screen);
+      onNavigate(TRADE_SCOUT_TOUR_STEPS[prevIdx].screen);
     }
   };
 
@@ -71,7 +74,7 @@ export const DemoTourBanner: React.FC<DemoTourBannerProps> = ({
         }}
       >
         <Sparkles size={16} />
-        <span>Client Demo Guide (Step {step.stepNumber}/16)</span>
+        <span>Trade Scout Demo Guide (Step {step.stepNumber}/{TRADE_SCOUT_TOUR_STEPS.length})</span>
       </button>
     );
   }
@@ -121,7 +124,7 @@ export const DemoTourBanner: React.FC<DemoTourBannerProps> = ({
               fontWeight: 700,
               color: '#38bdf8'
             }}>
-              Demo Journey Step {step.stepNumber} of 16
+              AI Trade Scout Walkthrough ({step.stepNumber}/{TRADE_SCOUT_TOUR_STEPS.length})
             </span>
             <span style={{ fontSize: '0.68rem', color: '#64748b' }}>•</span>
             <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#a5b4fc' }}>
@@ -181,13 +184,13 @@ export const DemoTourBanner: React.FC<DemoTourBannerProps> = ({
               zIndex: 100
             }}>
               <div style={{ padding: '6px 10px', fontSize: '0.72rem', fontWeight: 700, color: '#64748b', display: 'flex', justifyContent: 'space-between' }}>
-                <span>16-STEP COMPLETE BUYER-TO-SHIPMENT JOURNEY</span>
+                <span>TRADE SCOUT MILESTONE 1 DEMO</span>
                 <button onClick={() => setMenuOpen(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
                   <X size={13} />
                 </button>
               </div>
 
-              {DEMO_TOUR_STEPS.map((s, idx) => (
+              {TRADE_SCOUT_TOUR_STEPS.map((s, idx) => (
                 <button
                   key={s.stepNumber}
                   onClick={() => {
@@ -241,7 +244,7 @@ export const DemoTourBanner: React.FC<DemoTourBannerProps> = ({
           disabled={isFirst}
           style={{
             padding: '7px 12px',
-            backgroundColor: isFirst ? '#1e293b' : '#1e293b',
+            backgroundColor: '#1e293b',
             border: '1px solid #334155',
             borderRadius: '8px',
             color: isFirst ? '#475569' : '#cbd5e1',

@@ -7,9 +7,8 @@ import {
   Shield,
   HelpCircle,
   Globe,
-  SlidersHorizontal,
+  Compass,
   CheckCircle2,
-  AlertTriangle,
   ChevronDown
 } from 'lucide-react';
 import { ScreenType, UserRole } from '../../types';
@@ -32,12 +31,29 @@ export const Header: React.FC<HeaderProps> = ({
   unreadCount
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [roleDropdownOpen, setRoleDropdownOpen] = useState(false);
 
   const getScreenTitle = (screen: ScreenType): { title: string; subtitle: string } => {
     switch (screen) {
       case 'dashboard':
-        return { title: 'Executive Trade Dashboard', subtitle: 'Overview of sourcing, shipments, AI validations and operations' };
+        return {
+          title: 'Trade Scout Intelligence Dashboard',
+          subtitle: 'Overview of market discovery sessions, company qualification metrics & saved leads'
+        };
+      case 'trade-scout':
+        return {
+          title: 'AI Trade Scout',
+          subtitle: 'Tell us what you sell and where you want to sell it. AI identifies the companies worth investigating.'
+        };
+      case 'saved-leads':
+        return {
+          title: 'Saved Trade Leads',
+          subtitle: 'Curated export distributor prospects ready for commercial engagement & outreach'
+        };
+      case 'research-history':
+        return {
+          title: 'Market Research History',
+          subtitle: 'Archive of completed market research sessions across global customs & trade registries'
+        };
       case 'ai-assistant':
         return { title: 'AI Trade Assistant', subtitle: 'Autonomous supplier matching, RFQ generation & trade copilot' };
       case 'marketplace':
@@ -63,7 +79,7 @@ export const Header: React.FC<HeaderProps> = ({
       case 'admin':
         return { title: 'Admin & Operations Control Center', subtitle: 'Human-in-the-loop triage, supplier verification & audit logs' };
       default:
-        return { title: 'TradeAI Platform', subtitle: 'Next-Gen B2B Import-Export Operating System' };
+        return { title: 'TradeAI Scout Platform', subtitle: 'Next-Gen AI Market Discovery for Exporters & Manufacturers' };
     }
   };
 
@@ -85,7 +101,7 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Title / Breadcrumb */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <h1 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#f8fafc', margin: 0 }}>
+          <h1 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
             {currentInfo.title}
           </h1>
           <span style={{
@@ -94,29 +110,29 @@ export const Header: React.FC<HeaderProps> = ({
             borderRadius: '9999px',
             backgroundColor: '#1e293b',
             color: '#38bdf8',
-            fontWeight: 600,
+            fontWeight: 700,
             border: '1px solid #334155'
           }}>
-            SIMULATED LIVE
+            TRADE SCOUT v1.0
           </span>
         </div>
-        <p style={{ fontSize: '0.74rem', color: '#64748b', margin: 0, lineHeight: 1.2 }}>
+        <p style={{ fontSize: '0.74rem', color: '#94a3b8', margin: 0, lineHeight: 1.2 }}>
           {currentInfo.subtitle}
         </p>
       </div>
 
-      {/* Global Quick Search */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      {/* Global Quick Search & Actions */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
         <div style={{
           position: 'relative',
-          width: '280px',
+          width: '260px',
           display: 'flex',
           alignItems: 'center'
         }}>
           <Search size={15} color="#64748b" style={{ position: 'absolute', left: '12px', pointerEvents: 'none' }} />
           <input
             type="text"
-            placeholder="Search suppliers, orders, RFQs, HS codes..."
+            placeholder="Search markets, products, companies..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
@@ -125,40 +141,40 @@ export const Header: React.FC<HeaderProps> = ({
               border: '1px solid #24324d',
               borderRadius: '20px',
               padding: '7px 12px 7px 34px',
-              fontSize: '0.8rem',
+              fontSize: '0.78rem',
               color: '#f8fafc',
               outline: 'none'
             }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                onNavigate('marketplace');
+                onNavigate('trade-scout');
               }
             }}
           />
         </div>
 
-        {/* AI Quick Button */}
+        {/* Trade Scout Quick Action Button */}
         <button
-          onClick={() => onNavigate('ai-assistant')}
+          onClick={() => onNavigate('trade-scout')}
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
             padding: '7px 14px',
             borderRadius: '8px',
-            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(6, 182, 212, 0.2) 100%)',
+            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(6, 182, 212, 0.25) 100%)',
             border: '1px solid rgba(99, 102, 241, 0.4)',
             color: '#a5b4fc',
             fontSize: '0.8rem',
-            fontWeight: 600,
+            fontWeight: 700,
             cursor: 'pointer'
           }}
         >
-          <Bot size={15} color="#38bdf8" />
-          <span>Ask AI</span>
+          <Compass size={15} color="#38bdf8" />
+          <span>New Scout</span>
         </button>
 
-        {/* Notification Bell */}
+        {/* Notifications Bell */}
         <button
           onClick={onOpenNotifications}
           style={{
@@ -174,7 +190,7 @@ export const Header: React.FC<HeaderProps> = ({
             color: '#cbd5e1',
             cursor: 'pointer'
           }}
-          title="Notifications & Trade Alerts"
+          title="Trade Alerts"
         >
           <Bell size={17} />
           {unreadCount > 0 && (
@@ -182,7 +198,7 @@ export const Header: React.FC<HeaderProps> = ({
               position: 'absolute',
               top: '-4px',
               right: '-4px',
-              backgroundColor: '#f43f5e',
+              backgroundColor: '#6366f1',
               color: '#ffffff',
               fontSize: '0.65rem',
               fontWeight: 800,
@@ -191,101 +207,12 @@ export const Header: React.FC<HeaderProps> = ({
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 0 8px rgba(244, 63, 94, 0.8)'
+              justifyContent: 'center'
             }}>
               {unreadCount}
             </span>
           )}
         </button>
-
-        {/* Role Switcher Pill */}
-        <div style={{ position: 'relative' }}>
-          <button
-            onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              backgroundColor: '#161f30',
-              border: '1px solid #24324d',
-              borderRadius: '8px',
-              padding: '6px 12px',
-              cursor: 'pointer',
-              color: '#f8fafc'
-            }}
-          >
-            <div style={{
-              width: '24px',
-              height: '24px',
-              borderRadius: '50%',
-              backgroundColor: '#4f46e5',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '0.72rem',
-              fontWeight: 700
-            }}>
-              {userRole === 'buyer' ? 'B' : userRole === 'supplier' ? 'S' : userRole === 'operations' ? 'O' : 'A'}
-            </div>
-            <div style={{ textAlign: 'left', lineHeight: 1.1 }}>
-              <div style={{ fontSize: '0.76rem', fontWeight: 600, textTransform: 'capitalize' }}>{userRole}</div>
-              <div style={{ fontSize: '0.64rem', color: '#64748b' }}>Demo View</div>
-            </div>
-            <ChevronDown size={14} color="#64748b" />
-          </button>
-
-          {roleDropdownOpen && (
-            <div style={{
-              position: 'absolute',
-              right: 0,
-              top: '44px',
-              width: '200px',
-              backgroundColor: '#161f30',
-              border: '1px solid #334155',
-              borderRadius: '10px',
-              boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
-              padding: '6px',
-              zIndex: 50
-            }}>
-              <div style={{ padding: '6px 10px', fontSize: '0.7rem', fontWeight: 700, color: '#64748b' }}>
-                SWITCH DEMO PERSPECTIVE
-              </div>
-              {[
-                { role: 'buyer', label: 'Importer / Buyer (Sarah)' },
-                { role: 'supplier', label: 'Supplier (ABC Textiles)' },
-                { role: 'operations', label: 'Operations & Logistics' },
-                { role: 'admin', label: 'Super Admin / Compliance' }
-              ].map((item) => (
-                <button
-                  key={item.role}
-                  onClick={() => {
-                    onRoleChange(item.role as UserRole);
-                    setRoleDropdownOpen(false);
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    textAlign: 'left',
-                    borderRadius: '6px',
-                    border: 'none',
-                    backgroundColor: userRole === item.role ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
-                    color: userRole === item.role ? '#38bdf8' : '#e2e8f0',
-                    fontSize: '0.78rem',
-                    fontWeight: userRole === item.role ? 600 : 400,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between'
-                  }}
-                >
-                  <span>{item.label}</span>
-                  {userRole === item.role && <CheckCircle2 size={13} color="#38bdf8" />}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
     </header>
   );

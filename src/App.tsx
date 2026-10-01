@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
-import { ScreenType, UserRole, Supplier, TradeDocument } from './types';
-import { SUPPLIERS, MOCK_DOCUMENTS, DEMO_TOUR_STEPS } from './data/mockData';
+import { ScreenType, UserRole, Supplier, TradeDocument, ProspectCompany, ProspectContact, SavedLead, ResearchSession } from './types';
+import { SUPPLIERS, MOCK_DOCUMENTS } from './data/mockData';
+import {
+  KENYA_REFRIGERATION_PROSPECTS,
+  INITIAL_SAVED_LEADS,
+  MOCK_RESEARCH_SESSIONS,
+  TRADE_SCOUT_TOUR_STEPS
+} from './data/tradeScoutData';
 
 // Navigation Components
 import { Sidebar } from './components/navigation/Sidebar';
@@ -14,9 +20,14 @@ import { AICustomerUpdateModal } from './components/modals/AICustomerUpdateModal
 import { DocumentOCRModal } from './components/modals/DocumentOCRModal';
 import { NotificationsModal } from './components/modals/NotificationsModal';
 
-// Screens
-import { LoginScreen } from './components/screens/LoginScreen';
+// Milestone 1 Trade Scout Screens
+import { TradeScoutScreen } from './components/screens/TradeScoutScreen';
+import { SavedLeadsScreen } from './components/screens/SavedLeadsScreen';
+import { ResearchHistoryScreen } from './components/screens/ResearchHistoryScreen';
+
+// Secondary / Existing Screens
 import { DashboardScreen } from './components/screens/DashboardScreen';
+import { LoginScreen } from './components/screens/LoginScreen';
 import { AIAssistantScreen } from './components/screens/AIAssistantScreen';
 import { MarketplaceScreen } from './components/screens/MarketplaceScreen';
 import { SupplierProfileScreen } from './components/screens/SupplierProfileScreen';
@@ -33,12 +44,15 @@ import { AdminOperationsScreen } from './components/screens/AdminOperationsScree
 export const App: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('dashboard');
   const [userRole, setUserRole] = useState<UserRole>('buyer');
-  const [demoStepIndex, setDemoStepIndex] = useState<number>(1); // starts on Dashboard (Step 2)
+  const [demoStepIndex, setDemoStepIndex] = useState<number>(0);
+
+  // Trade Scout Saved Leads State
+  const [savedLeads, setSavedLeads] = useState<SavedLead[]>(INITIAL_SAVED_LEADS);
 
   // Modals state
   const [selectedSupplierForQuote, setSelectedSupplierForQuote] = useState<Supplier | null>(null);
   const [selectedSupplierForProfile, setSelectedSupplierForProfile] = useState<Supplier>(SUPPLIERS[0]);
-  const [selectedDocForOCR, setSelectedDocForOCR] = useState<TradeDocument | null>(MOCK_DOCUMENTS[1]); // PL-ABC-9821 by default
+  const [selectedDocForOCR, setSelectedDocForOCR] = useState<TradeDocument | null>(MOCK_DOCUMENTS[1]);
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
   const [isHandoffModalOpen, setIsHandoffModalOpen] = useState(false);
   const [isCustomerUpdateModalOpen, setIsCustomerUpdateModalOpen] = useState(false);
@@ -48,10 +62,46 @@ export const App: React.FC = () => {
   // Sync navigation with demo step index
   const handleNavigate = (screen: ScreenType) => {
     setCurrentScreen(screen);
-    const matchingStepIdx = DEMO_TOUR_STEPS.findIndex((s) => s.screen === screen);
+    const matchingStepIdx = TRADE_SCOUT_TOUR_STEPS.findIndex((s) => s.screen === screen);
     if (matchingStepIdx !== -1) {
       setDemoStepIndex(matchingStepIdx);
     }
+  };
+
+  const handleSaveLead = (prospect: ProspectCompany, contact?: ProspectContact) => {
+    const contactPerson = contact || prospect.contacts[0] || {
+      name: 'Key Purchasing Contact',
+      role: 'Procurement Department'
+    };
+
+    if (savedLeads.some((l) => l.companyId === prospect.id || l.company === prospect.name)) {
+      return;
+    }
+
+    const newLead: SavedLead = {
+      id: `lead-${Date.now()}`,
+      companyId: prospect.id,
+      company: prospect.name,
+      country: prospect.country,
+      contactName: contactPerson.name,
+      contactRole: contactPerson.role,
+      product: 'Commercial Refrigeration Equipment',
+      status: 'Qualified',
+      qualification: prospect.productRelevance,
+      aiReason: prospect.whyThisCompany,
+      notes: `Discovered via AI Trade Scout research. Active import volume: ${prospect.approxVolume}.`,
+      lastResearchDate: 'Today',
+      nextAction: `Reach out to ${contactPerson.name} (${contactPerson.role}) with technical product line catalog.`,
+      website: prospect.website
+    };
+
+    setSavedLeads((prev) => [newLead, ...prev]);
+  };
+
+  const handleUpdateLeadStatus = (id: string, status: SavedLead['status']) => {
+    setSavedLeads((prev) =>
+      prev.map((l) => (l.id === id ? { ...l, status } : l))
+    );
   };
 
   const handleOpenQuoteModal = (supplier: Supplier) => {
@@ -72,7 +122,7 @@ export const App: React.FC = () => {
           onLogin={(role) => {
             setUserRole(role);
             setCurrentScreen('dashboard');
-            setDemoStepIndex(1);
+            setDemoStepIndex(0);
           }}
           onNavigate={handleNavigate}
         />
@@ -84,6 +134,8 @@ export const App: React.FC = () => {
       </div>
     );
   }
+
+  const savedCompanyIds = savedLeads.map((l) => l.companyId);
 
   return (
     <div style={{
@@ -98,8 +150,8 @@ export const App: React.FC = () => {
         currentScreen={currentScreen}
         onNavigate={handleNavigate}
         userRole={userRole}
-        unreadExceptionsCount={2}
-        pendingQuotesCount={3}
+        savedLeadsCount={savedLeads.length}
+        researchesCount={24}
       />
 
       {/* Main Content Area */}
@@ -119,19 +171,42 @@ export const App: React.FC = () => {
           userRole={userRole}
           onRoleChange={setUserRole}
           onOpenNotifications={() => setIsNotificationsOpen(true)}
-          unreadCount={3}
+          unreadCount={2}
         />
 
         {/* Dynamic Screen Routing */}
         <main style={{ flex: 1 }}>
+          {/* Milestone 1 Core Screens */}
           {currentScreen === 'dashboard' && (
-            <DashboardScreen
+            <DashboardScreen onNavigate={handleNavigate} />
+          )}
+
+          {currentScreen === 'trade-scout' && (
+            <TradeScoutScreen
               onNavigate={handleNavigate}
-              onOpenDocModal={() => handleOpenDocOCR(MOCK_DOCUMENTS[1])}
-              onOpenShipmentModal={() => setIsCustomerUpdateModalOpen(true)}
+              onSaveLead={handleSaveLead}
+              savedCompanyIds={savedCompanyIds}
             />
           )}
 
+          {currentScreen === 'saved-leads' && (
+            <SavedLeadsScreen
+              savedLeads={savedLeads}
+              onNavigate={handleNavigate}
+              onUpdateLeadStatus={handleUpdateLeadStatus}
+            />
+          )}
+
+          {currentScreen === 'research-history' && (
+            <ResearchHistoryScreen
+              onNavigate={handleNavigate}
+              onOpenSession={(session) => {
+                handleNavigate('trade-scout');
+              }}
+            />
+          )}
+
+          {/* Secondary / Future Milestone Screens */}
           {currentScreen === 'ai-assistant' && (
             <AIAssistantScreen
               onNavigate={handleNavigate}
@@ -220,7 +295,7 @@ export const App: React.FC = () => {
         </main>
       </div>
 
-      {/* Interactive 16-Step Client Demo Walkthrough Banner */}
+      {/* Interactive 10-Step AI Trade Scout Walkthrough Banner */}
       <DemoTourBanner
         currentStepIndex={demoStepIndex}
         onSelectStep={(idx) => setDemoStepIndex(idx)}
